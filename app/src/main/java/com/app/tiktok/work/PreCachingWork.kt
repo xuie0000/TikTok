@@ -21,6 +21,7 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.joinAll
 
 private const val TAG = "PreCachingService"
+
 class PreCachingService(appContext: Context, params: WorkerParameters) :
     CoroutineWorker(appContext, params) {
     private var cachingJob: Deferred<Unit?>? = null
@@ -29,10 +30,14 @@ class PreCachingService(appContext: Context, params: WorkerParameters) :
 
 
     override suspend fun doWork(): Result = coroutineScope {
-        cacheDataSourceFactory = CacheDataSourceFactory(simpleCache,
+        cacheDataSourceFactory = CacheDataSourceFactory(
+            simpleCache,
             DefaultHttpDataSourceFactory(
-                Util.getUserAgent(applicationContext,
-                    "exo"))
+                Util.getUserAgent(
+                    applicationContext,
+                    "exo"
+                )
+            )
         )
 
         val dataList = inputData.getStringArray(Constants.KEY_STORIES_LIST_DATA)
