@@ -14,7 +14,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_main.*
 
 @AndroidEntryPoint
-class MainActivity: BaseActivity(), NavController.OnDestinationChangedListener {
+class MainActivity : BaseActivity(), NavController.OnDestinationChangedListener {
     private val homeViewModel by viewModels<MainViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {

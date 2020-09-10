@@ -10,7 +10,7 @@ import com.app.tiktok.repository.DataRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flow
 
-class MainViewModel @ViewModelInject constructor(private val dataRepository: DataRepository): ViewModel() {
+class MainViewModel @ViewModelInject constructor(private val dataRepository: DataRepository) : ViewModel() {
     fun getDataList(): LiveData<ResultData<ArrayList<StoriesDataModel>?>> {
         return flow {
             emit(ResultData.Loading())

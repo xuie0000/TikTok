@@ -82,22 +82,26 @@ class StoryViewFragment : Fragment(R.layout.fragment_story_view) {
         super.onDestroy()
     }
 
-    private val playerCallback: Player.EventListener? = object: Player.EventListener {
+    private val playerCallback: Player.EventListener = object : Player.EventListener {
         override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
             logError("onPlayerStateChanged playbackState: $playbackState")
         }
 
-        override fun onPlayerError(error: com.google.android.exoplayer2.ExoPlaybackException?) {
+        override fun onPlayerError(error: com.google.android.exoplayer2.ExoPlaybackException) {
             super.onPlayerError(error)
         }
     }
 
     private fun prepareVideoPlayer() {
-        simplePlayer = ExoPlayerFactory.newSimpleInstance(context)
-        cacheDataSourceFactory = CacheDataSourceFactory(simpleCache,
+        simplePlayer = ExoPlayerFactory.newSimpleInstance(requireContext())
+        cacheDataSourceFactory = CacheDataSourceFactory(
+            simpleCache,
             DefaultHttpDataSourceFactory(
-                Util.getUserAgent(context,
-                "exo"))
+                Util.getUserAgent(
+                    requireContext(),
+                    "exo"
+                )
+            )
         )
     }
 
