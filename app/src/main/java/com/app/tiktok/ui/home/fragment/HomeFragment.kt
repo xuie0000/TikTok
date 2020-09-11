@@ -2,6 +2,7 @@ package com.app.tiktok.ui.home.fragment
 
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import com.app.tiktok.R
 import com.app.tiktok.base.BaseFragment
 import com.app.tiktok.ui.home.adapter.HomePagerAdapter
@@ -21,5 +22,11 @@ class HomeFragment : BaseFragment(R.layout.fragment_home) {
             tab.text = tabTitles[position]
         }.attach()
 
+        initAction()
+    }
+
+    private fun initAction() {
+        iv_online.setOnClickListener { Toast.makeText(requireContext(), "直播", Toast.LENGTH_SHORT).show() }
+        iv_search.setOnClickListener { Toast.makeText(requireContext(), "搜索", Toast.LENGTH_SHORT).show() }
     }
 }
