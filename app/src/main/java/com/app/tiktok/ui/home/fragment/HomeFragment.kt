@@ -14,12 +14,12 @@ class HomeFragment : BaseFragment(R.layout.fragment_home) {
         super.onViewCreated(view, savedInstanceState)
 
         pager.adapter = HomePagerAdapter(this)
+        pager.offscreenPageLimit = 3
 
-        val tabTitles = listOf("同城", "关注", "推荐")
+        val tabTitles = listOf("推荐", "关注", "同城")
         TabLayoutMediator(tab, pager) { tab, position ->
             tab.text = tabTitles[position]
         }.attach()
-        pager.currentItem = 2
 
     }
 }

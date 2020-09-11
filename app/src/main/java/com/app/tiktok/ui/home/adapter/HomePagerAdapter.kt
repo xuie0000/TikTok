@@ -17,9 +17,9 @@ class HomePagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
 
     override fun createFragment(position: Int): Fragment {
         return when (position) {
-            0 -> CityFragment()
+            0 -> RecommendFragment()
             1 -> FollowFragment()
-            2 -> RecommendFragment()
+            2 -> CityFragment()
             else -> throw IllegalArgumentException("argument exception")
         }
     }

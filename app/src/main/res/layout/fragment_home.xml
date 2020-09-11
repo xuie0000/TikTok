@@ -8,26 +8,31 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <com.google.android.material.tabs.TabLayout
-            android:id="@+id/tab"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:tabIndicatorColor="@color/colorWhite"
-            app:tabIndicatorFullWidth="false" />
-
         <androidx.viewpager2.widget.ViewPager2
             android:id="@+id/pager"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layoutDirection="rtl"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tab">
+            app:layout_constraintTop_toTopOf="parent">
 
         </androidx.viewpager2.widget.ViewPager2>
+
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            android:layoutDirection="rtl"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tabIndicatorColor="@android:color/transparent"
+            app:tabSelectedTextColor="@color/colorWhite"
+            app:tabTextAppearance="@style/TabLayoutTextSize"
+            app:tabTextColor="@color/colorGray" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
