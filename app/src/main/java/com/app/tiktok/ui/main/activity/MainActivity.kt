@@ -1,7 +1,10 @@
 package com.app.tiktok.ui.main.activity
 
+import android.app.ActivityOptions
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
@@ -10,6 +13,7 @@ import androidx.navigation.ui.setupWithNavController
 import com.app.tiktok.R
 import com.app.tiktok.base.BaseActivity
 import com.app.tiktok.ui.main.viewmodel.MainViewModel
+import com.app.tiktok.ui.search.SearchActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -25,6 +29,8 @@ class MainActivity : BaseActivity(), NavController.OnDestinationChangedListener 
         nav_view.setupWithNavController(navController)
 
         navController.addOnDestinationChangedListener(this)
+
+        image_view_add_icon.setOnClickListener { startSearchActivity() }
     }
 
     override fun onDestinationChanged(
@@ -68,5 +74,10 @@ class MainActivity : BaseActivity(), NavController.OnDestinationChangedListener 
                 image_view_add_icon.setImageResource(R.drawable.ic_add_icon_dark)
             }
         }
+    }
+
+    private fun startSearchActivity() {
+        val options = ActivityOptions.makeSceneTransitionAnimation(this)
+        ActivityCompat.startActivity(this, Intent(this, SearchActivity::class.java), options.toBundle())
     }
 }

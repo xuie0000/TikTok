@@ -1,11 +1,15 @@
 package com.app.tiktok.ui.home.fragment
 
+import android.app.ActivityOptions
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
+import androidx.core.app.ActivityCompat
 import com.app.tiktok.R
 import com.app.tiktok.base.BaseFragment
 import com.app.tiktok.ui.home.adapter.HomePagerAdapter
+import com.app.tiktok.ui.search.SearchActivity
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.android.synthetic.main.fragment_home.*
 
@@ -27,6 +31,13 @@ class HomeFragment : BaseFragment(R.layout.fragment_home) {
 
     private fun initAction() {
         iv_online.setOnClickListener { Toast.makeText(requireContext(), "直播", Toast.LENGTH_SHORT).show() }
-        iv_search.setOnClickListener { Toast.makeText(requireContext(), "搜索", Toast.LENGTH_SHORT).show() }
+        iv_search.setOnClickListener { startSearchActivity() }
     }
+
+    private fun startSearchActivity() {
+        val activity = requireActivity()
+        val options = ActivityOptions.makeSceneTransitionAnimation(activity)
+        ActivityCompat.startActivity(activity, Intent(activity, SearchActivity::class.java), options.toBundle())
+    }
+
 }
