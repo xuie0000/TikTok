@@ -12,7 +12,7 @@ import dagger.hilt.android.HiltAndroidApp
 class MyApp: Application() {
     companion object {
         var simpleCache: SimpleCache? = null
-        var context: Context? = null
+        lateinit var context: Context
     }
 
     override fun onCreate() {
