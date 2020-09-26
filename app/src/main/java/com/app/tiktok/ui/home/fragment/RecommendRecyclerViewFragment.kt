@@ -36,14 +36,15 @@ class RecommendRecyclerViewFragment : Fragment(R.layout.fragment_recommend_recyc
                     if (!value.data.isNullOrEmpty()) {
                         val dataList = value.data
                         storyViewPager = StoryViewAdapter { view, position, item ->
-                            Log.d("RecommendRecyclerViewFragment", "position:$position")
+                            Log.d("RecyclerViewFragment", "position:$position")
                         }
                         val viewPagerLayoutManager = ViewPagerLayoutManager(requireContext())
                         viewPagerLayoutManager.setOnViewPagerListener(storyViewPager.onViewPagerListener)
                         recycler_view.layoutManager = viewPagerLayoutManager
                         recycler_view.adapter = storyViewPager
+                        (recycler_view.layoutManager as ViewPagerLayoutManager).findViewByPosition(2)
 
-                        Log.d("RecommendRecyclerViewFragment", "size:${dataList.size}")
+                        Log.d("RecyclerViewFragment", "size:${dataList.size}")
                         storyViewPager.submitList(dataList)
 
                         startPreCaching(dataList)

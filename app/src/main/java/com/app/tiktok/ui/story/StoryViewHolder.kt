@@ -22,6 +22,7 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.app.tiktok.R
+import com.app.tiktok.app.MyApp
 import com.app.tiktok.databinding.LayoutStoryView2Binding
 import com.app.tiktok.model.StoriesDataModel
 import com.app.tiktok.utils.formatNumberAsReadableFormat
@@ -29,12 +30,18 @@ import com.app.tiktok.utils.loadCenterCropImageFromUrl
 import com.app.tiktok.utils.setTextOrHide
 import com.app.tiktok.widget.viewpagerlayoutmanager.OnViewPagerListener
 import com.google.android.exoplayer2.SimpleExoPlayer
+import com.google.android.exoplayer2.upstream.cache.CacheDataSourceFactory
 
 class StoryViewHolder(
     private val binding: LayoutStoryView2Binding,
     private val clickCallback: ((view: View, position: Int, story: StoriesDataModel) -> Unit)?,
     private val longClickCallback: ((view: View, position: Int, article: StoriesDataModel) -> Boolean)?
 ) : RecyclerView.ViewHolder(binding.root) {
+
+    private var simplePlayer: SimpleExoPlayer? = null
+    private var cacheDataSourceFactory: CacheDataSourceFactory? = null
+    private val simpleCache = MyApp.simpleCache
+    private var storyUrl: String? = null
 
     fun bind(story: StoriesDataModel?, simplePlayer: SimpleExoPlayer?) {
         updateScore(story, simplePlayer)

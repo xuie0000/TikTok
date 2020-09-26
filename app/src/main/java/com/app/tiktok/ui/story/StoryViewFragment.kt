@@ -8,7 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.app.tiktok.R
 import com.app.tiktok.app.MyApp
-import com.app.tiktok.model.StoriesDataModel
+import com.app.tiktok.model.TikTok
 import com.app.tiktok.ui.main.viewmodel.MainViewModel
 import com.app.tiktok.utils.*
 import com.google.android.exoplayer2.ExoPlayerFactory
@@ -18,12 +18,13 @@ import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.ui.PlayerView
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory
 import com.google.android.exoplayer2.upstream.cache.CacheDataSourceFactory
+import com.google.android.exoplayer2.util.Log
 import com.google.android.exoplayer2.util.Util
 import kotlinx.android.synthetic.main.layout_story_view.*
 
 class StoryViewFragment : Fragment(R.layout.fragment_story_view) {
     private var storyUrl: String? = null
-    private var storiesDataModel: StoriesDataModel? = null
+    private var storiesDataModel: TikTok? = null
 
     private var simplePlayer: SimpleExoPlayer? = null
     private var cacheDataSourceFactory: CacheDataSourceFactory? = null
@@ -31,12 +32,14 @@ class StoryViewFragment : Fragment(R.layout.fragment_story_view) {
     private var toPlayVideoPosition: Int = -1
 
     companion object {
-        fun newInstance(storiesDataModel: StoriesDataModel) = StoryViewFragment()
+        fun newInstance(storiesDataModel: TikTok) = StoryViewFragment()
             .apply {
                 arguments = Bundle().apply {
                     putParcelable(Constants.KEY_STORY_DATA, storiesDataModel)
                 }
             }
+
+        const val TAG = "StoryViewFragment"
     }
 
     private val viewModel by activityViewModels<MainViewModel>()
@@ -63,18 +66,21 @@ class StoryViewFragment : Fragment(R.layout.fragment_story_view) {
         val simplePlayer = getPlayer()
         player_view_story.player = simplePlayer
 
-        storyUrl = storiesDataModel?.storyUrl
+        storyUrl = "http://120.79.19.40:81/${storiesDataModel?.storyUrl}"
+        Log.d(TAG, "url : $storyUrl")
         storyUrl?.let { prepareMedia(it) }
     }
 
-    override fun onPause() {
-        pauseVideo()
-        super.onPause()
-    }
-
     override fun onResume() {
+        Log.d(TAG, "onResume ${storiesDataModel?.storyId}")
         restartVideo()
         super.onResume()
+    }
+
+    override fun onPause() {
+        Log.d(TAG, "onPause ${storiesDataModel?.storyId}")
+        pauseVideo()
+        super.onPause()
     }
 
     override fun onDestroy() {
@@ -121,7 +127,7 @@ class StoryViewFragment : Fragment(R.layout.fragment_story_view) {
 
         simplePlayer?.prepare(mediaSource, true, true)
         simplePlayer?.repeatMode = Player.REPEAT_MODE_ONE
-        simplePlayer?.playWhenReady = true
+//        simplePlayer?.playWhenReady = true
         simplePlayer?.addListener(playerCallback)
 
         toPlayVideoPosition = -1
@@ -153,4 +159,5 @@ class StoryViewFragment : Fragment(R.layout.fragment_story_view) {
         simplePlayer?.stop(true)
         simplePlayer?.release()
     }
+
 }
