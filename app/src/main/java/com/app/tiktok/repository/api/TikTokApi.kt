@@ -24,7 +24,7 @@ interface TikTokApi {
     @GET("tiktok/list")
     suspend fun getTikTok(
         @Query("page") page: Int,
-        @Query("size") size: Int = 20
+        @Query("size") size: Int = 5
     ): Response<ResultTiktok>
 
     companion object {
