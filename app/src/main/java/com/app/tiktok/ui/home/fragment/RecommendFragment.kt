@@ -29,7 +29,6 @@ class RecommendFragment : Fragment(R.layout.fragment_recommend) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         Log.d(TAG, "onCreated.")
-        appendList()
 
         storiesPagerAdapter = StoriesPagerAdapter(this, dataList)
         view_pager_stories.adapter = storiesPagerAdapter
@@ -43,8 +42,12 @@ class RecommendFragment : Fragment(R.layout.fragment_recommend) {
                 }
             }
         })
-        homeViewModel.data.observe(viewLifecycleOwner, {
-            when(it) {
+        appendList()
+    }
+
+    private fun appendList() {
+        homeViewModel.appendList().observe(viewLifecycleOwner, {
+            when (it) {
                 is ResultData.Loading -> {
 
                 }
@@ -61,10 +64,6 @@ class RecommendFragment : Fragment(R.layout.fragment_recommend) {
                 }
             }
         })
-    }
-
-    private fun appendList() {
-        homeViewModel.appendList()
     }
 
     private fun startPreCaching(dataList: List<TikTok>) {

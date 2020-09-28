@@ -3,9 +3,9 @@ package com.app.tiktok.ui.main.viewmodel
 import android.util.Log
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
+import androidx.lifecycle.liveData
 import com.app.tiktok.model.ResultData
 import com.app.tiktok.model.StoriesDataModel
 import com.app.tiktok.model.TikTok
@@ -22,21 +22,19 @@ class MainViewModel @ViewModelInject constructor(private val dataRepository: Dat
         }.asLiveData(Dispatchers.IO)
     }
 
-    var data: LiveData<ResultData<List<TikTok>?>> = MutableLiveData()
-
     private var loading = false
     private var page = -1
     private var first = true
     private var last = false
 
-    fun appendList() {
+    fun appendList(): LiveData<ResultData<List<TikTok>?>> {
         if (last && loading) {
-            return
+            return liveData { }
         }
         loading = true
         page++
         Log.d(TAG, "loading page $page")
-        data = flow {
+        return flow {
             Log.d(TAG, "loading page 222  $page")
             emit(ResultData.Loading())
             val data = TikTokApi.create().getTikTok(page).body()
