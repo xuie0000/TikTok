@@ -145,6 +145,7 @@ class StoryViewFragment : Fragment(R.layout.fragment_story_view) {
     private fun restartVideo() {
         if (simplePlayer == null) {
             storyUrl?.let { prepareMedia(it) }
+            simplePlayer?.playWhenReady = true
         } else {
             simplePlayer?.seekToDefaultPosition()
             simplePlayer?.playWhenReady = true
