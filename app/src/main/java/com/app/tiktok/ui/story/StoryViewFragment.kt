@@ -1,5 +1,6 @@
 package com.app.tiktok.ui.story
 
+import android.animation.ObjectAnimator
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
@@ -62,13 +63,34 @@ class StoryViewFragment : Fragment(R.layout.fragment_story_view) {
         image_view_profile_pic?.loadCenterCropImageFromUrl(storiesDataModel?.userProfilePicUrl)
 
         text_view_music_title.isSelected = true
+        button_play_status.visibility = View.GONE
 
         val simplePlayer = getPlayer()
         player_view_story.player = simplePlayer
+        player_view_story?.videoSurfaceView?.setOnClickListener {
+            switchVideoStatus(simplePlayer)
+        }
+        button_play_status?.setOnClickListener {
+            switchVideoStatus(simplePlayer)
+        }
 
         storyUrl = "http://120.79.19.40:81/${storiesDataModel?.storyUrl}"
         Log.d(TAG, "url : $storyUrl")
         storyUrl?.let { prepareMedia(it) }
+    }
+
+    private fun switchVideoStatus(simplePlayer: SimpleExoPlayer?) {
+        simplePlayer?.run {
+            if (isPlaying) {
+                pauseVideo()
+                button_play_status?.visibility = View.VISIBLE
+                ObjectAnimator.ofFloat(button_play_status, "scaleX", 2.0f, 1.0f).start()
+                ObjectAnimator.ofFloat(button_play_status, "scaleY", 2.0f, 1.0f).start()
+            } else {
+                playVideo()
+                button_play_status?.visibility = View.GONE
+            }
+        }
     }
 
     override fun onResume() {
@@ -143,6 +165,7 @@ class StoryViewFragment : Fragment(R.layout.fragment_story_view) {
     }
 
     private fun restartVideo() {
+        button_play_status?.visibility = View.GONE
         if (simplePlayer == null) {
             storyUrl?.let { prepareMedia(it) }
             simplePlayer?.playWhenReady = true
