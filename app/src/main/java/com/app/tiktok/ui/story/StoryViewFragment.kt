@@ -121,7 +121,7 @@ class StoryViewFragment : Fragment(R.layout.fragment_story_view) {
     }
 
     private fun prepareVideoPlayer() {
-        simplePlayer = ExoPlayerFactory.newSimpleInstance(requireContext())
+        simplePlayer = SimpleExoPlayer.Builder(requireContext()).build()
         cacheDataSourceFactory = CacheDataSourceFactory(
             simpleCache,
             DefaultHttpDataSourceFactory(

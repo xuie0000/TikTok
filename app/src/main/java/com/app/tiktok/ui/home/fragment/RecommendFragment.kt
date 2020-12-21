@@ -62,6 +62,9 @@ class RecommendFragment : Fragment(R.layout.fragment_recommend) {
                     storiesPagerAdapter.notifyDataSetChanged()
                     startPreCaching(it.data)
                 }
+                else -> {
+
+                }
             }
         })
     }

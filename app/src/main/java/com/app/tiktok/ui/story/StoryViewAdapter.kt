@@ -9,7 +9,6 @@ import com.app.tiktok.app.MyApp
 import com.app.tiktok.model.StoriesDataModel
 import com.app.tiktok.utils.logError
 import com.app.tiktok.widget.viewpagerlayoutmanager.OnViewPagerListener
-import com.google.android.exoplayer2.ExoPlayerFactory
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
@@ -79,7 +78,7 @@ class StoryViewAdapter(
     }
 
     private fun prepareVideoPlayer() {
-        simplePlayer = ExoPlayerFactory.newSimpleInstance(MyApp.context)
+        simplePlayer = SimpleExoPlayer.Builder(MyApp.context).build()
         cacheDataSourceFactory = CacheDataSourceFactory(
             simpleCache,
             DefaultHttpDataSourceFactory(

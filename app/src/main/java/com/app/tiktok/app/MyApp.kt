@@ -19,7 +19,7 @@ class MyApp: Application() {
         super.onCreate()
         context = this
 
-        val leastRecentlyUsedCacheEvictor = LeastRecentlyUsedCacheEvictor(90 * 1024 * 1024)
+        val leastRecentlyUsedCacheEvictor = LeastRecentlyUsedCacheEvictor(900 * 1024 * 1024)
         val databaseProvider: DatabaseProvider = ExoDatabaseProvider(this)
 
         if (simpleCache == null) {

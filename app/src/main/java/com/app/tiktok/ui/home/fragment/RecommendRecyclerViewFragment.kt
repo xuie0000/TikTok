@@ -50,6 +50,9 @@ class RecommendRecyclerViewFragment : Fragment(R.layout.fragment_recommend_recyc
                         startPreCaching(dataList)
                     }
                 }
+                else -> {
+
+                }
             }
         })
     }
@@ -75,7 +78,6 @@ class RecommendRecyclerViewFragment : Fragment(R.layout.fragment_recommend_recyc
         super.onPause()
         storyViewPager.pauseVideo()
     }
-
 
 
 }
