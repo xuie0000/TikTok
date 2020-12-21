@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import androidx.work.Data
 import androidx.work.OneTimeWorkRequestBuilder
@@ -21,52 +22,57 @@ import kotlinx.android.synthetic.main.fragment_recommend.*
 
 @AndroidEntryPoint
 class RecommendFragment : Fragment(R.layout.fragment_recommend) {
-    private val homeViewModel by activityViewModels<MainViewModel>()
+    private val model by activityViewModels<MainViewModel>()
 
     private lateinit var storiesPagerAdapter: StoriesPagerAdapter
-    private val dataList: MutableList<TikTok> = mutableListOf()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         Log.d(TAG, "onCreated.")
 
-        storiesPagerAdapter = StoriesPagerAdapter(this, dataList)
+        storiesPagerAdapter = StoriesPagerAdapter(this, mutableListOf()).apply {
+            stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
+        }
+
         view_pager_stories.adapter = storiesPagerAdapter
         view_pager_stories.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
                 Log.d(TAG, "selected $position")
-                if (dataList.size - position < 4) {
-                    Log.d(TAG, "selected append $position")
-                    appendList()
+                // 距离未尾4个时继续加载
+                if (storiesPagerAdapter.dataList.size - position < 4) {
+                    Log.d(TAG, "need append, position at $position")
+                    model.fetchList()
                 }
             }
         })
-        appendList()
-    }
 
-    private fun appendList() {
-        homeViewModel.appendList().observe(viewLifecycleOwner, {
+        model.listLiveData.observe(viewLifecycleOwner, {
             when (it) {
                 is ResultData.Loading -> {
 
                 }
                 is ResultData.Success -> {
-                    storiesPagerAdapter.dataList.addAll(it.data!!)
-                    storiesPagerAdapter.notifyDataSetChanged()
-                    startPreCaching(it.data)
+                    it.data?.let { list ->
+                        storiesPagerAdapter.dataList.addAll(list)
+                        storiesPagerAdapter.notifyDataSetChanged()
+                        startPreCaching(list)
+                    }
                 }
                 is ResultData.Refresh -> {
-                    storiesPagerAdapter.dataList.clear()
-                    storiesPagerAdapter.dataList.addAll(it.data!!)
-                    storiesPagerAdapter.notifyDataSetChanged()
-                    startPreCaching(it.data)
+                    it.data?.let { list ->
+                        storiesPagerAdapter.dataList.clear()
+                        storiesPagerAdapter.dataList.addAll(list)
+                        storiesPagerAdapter.notifyDataSetChanged()
+                        startPreCaching(list)
+                    }
                 }
                 else -> {
 
                 }
             }
         })
+        model.fetchList()
     }
 
     private fun startPreCaching(dataList: List<TikTok>) {
