@@ -14,7 +14,7 @@ import com.app.tiktok.R
 import com.app.tiktok.model.ResultData
 import com.app.tiktok.model.TikTok
 import com.app.tiktok.ui.home.adapter.StoriesPagerAdapter
-import com.app.tiktok.ui.main.viewmodel.MainViewModel
+import com.app.tiktok.ui.main.MainViewModel
 import com.app.tiktok.utils.Constants
 import com.app.tiktok.work.PreCachingService
 import dagger.hilt.android.AndroidEntryPoint

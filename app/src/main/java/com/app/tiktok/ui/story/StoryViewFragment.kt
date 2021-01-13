@@ -10,9 +10,8 @@ import androidx.fragment.app.activityViewModels
 import com.app.tiktok.R
 import com.app.tiktok.app.MyApp
 import com.app.tiktok.model.TikTok
-import com.app.tiktok.ui.main.viewmodel.MainViewModel
+import com.app.tiktok.ui.main.MainViewModel
 import com.app.tiktok.utils.*
-import com.google.android.exoplayer2.ExoPlayerFactory
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
@@ -33,10 +32,10 @@ class StoryViewFragment : Fragment(R.layout.fragment_story_view) {
     private var toPlayVideoPosition: Int = -1
 
     companion object {
-        fun newInstance(storiesDataModel: TikTok) = StoryViewFragment()
+        fun newInstance(tikTok: TikTok) = StoryViewFragment()
             .apply {
                 arguments = Bundle().apply {
-                    putParcelable(Constants.KEY_STORY_DATA, storiesDataModel)
+                    putParcelable(Constants.KEY_STORY_DATA, tikTok)
                 }
             }
 

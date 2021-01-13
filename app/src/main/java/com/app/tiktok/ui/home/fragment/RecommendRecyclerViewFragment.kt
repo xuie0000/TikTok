@@ -11,7 +11,7 @@ import androidx.work.WorkManager
 import com.app.tiktok.R
 import com.app.tiktok.model.ResultData
 import com.app.tiktok.model.StoriesDataModel
-import com.app.tiktok.ui.main.viewmodel.MainViewModel
+import com.app.tiktok.ui.main.MainViewModel
 import com.app.tiktok.ui.story.StoryViewAdapter
 import com.app.tiktok.utils.Constants
 import com.app.tiktok.widget.viewpagerlayoutmanager.ViewPagerLayoutManager

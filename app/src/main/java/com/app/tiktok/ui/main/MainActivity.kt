@@ -1,4 +1,4 @@
-package com.app.tiktok.ui.main.activity
+package com.app.tiktok.ui.main
 
 import android.app.ActivityOptions
 import android.content.Intent
@@ -12,7 +12,6 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.app.tiktok.R
 import com.app.tiktok.base.BaseActivity
-import com.app.tiktok.ui.main.viewmodel.MainViewModel
 import com.app.tiktok.ui.search.SearchActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_main.*
