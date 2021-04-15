@@ -1,10 +1,10 @@
 package com.app.tiktok.ui.home.fragment
 
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import androidx.work.Data
@@ -19,6 +19,10 @@ import com.app.tiktok.utils.Constants
 import com.app.tiktok.work.PreCachingService
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_recommend.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.InternalCoroutinesApi
+import kotlinx.coroutines.flow.collect
+import timber.log.Timber
 
 @AndroidEntryPoint
 class RecommendFragment : Fragment(R.layout.fragment_recommend) {
@@ -26,9 +30,11 @@ class RecommendFragment : Fragment(R.layout.fragment_recommend) {
 
     private lateinit var storiesPagerAdapter: StoriesPagerAdapter
 
+    @ExperimentalCoroutinesApi
+    @InternalCoroutinesApi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        Log.d(TAG, "onCreated.")
+        Timber.d("onCreated.")
 
         storiesPagerAdapter = StoriesPagerAdapter(this, mutableListOf()).apply {
             stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
@@ -38,41 +44,49 @@ class RecommendFragment : Fragment(R.layout.fragment_recommend) {
         view_pager_stories.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
-                Log.d(TAG, "selected $position")
+                Timber.d("selected $position")
                 // 距离未尾4个时继续加载
                 if (storiesPagerAdapter.dataList.size - position < 4) {
-                    Log.d(TAG, "need append, position at $position")
+                    Timber.d("need append, position at $position")
                     model.fetchList()
                 }
             }
         })
 
-        model.listLiveData.observe(viewLifecycleOwner, {
-            when (it) {
-                is ResultData.Loading -> {
-
-                }
-                is ResultData.Success -> {
-                    it.data?.let { list ->
-                        storiesPagerAdapter.dataList.addAll(list)
-                        storiesPagerAdapter.notifyDataSetChanged()
-                        startPreCaching(list)
+        lifecycleScope.launchWhenCreated {
+            model.listFlow.collect {
+                when (it) {
+                    is ResultData.Loading -> {
+                        // show loading
                     }
-                }
-                is ResultData.Refresh -> {
-                    it.data?.let { list ->
-                        storiesPagerAdapter.dataList.clear()
-                        storiesPagerAdapter.dataList.addAll(list)
-                        storiesPagerAdapter.notifyDataSetChanged()
-                        startPreCaching(list)
+                    is ResultData.Success -> {
+                        it.data?.let { list ->
+                            storiesPagerAdapter.dataList.addAll(list)
+//                            storiesPagerAdapter.notifyDataSetChanged()
+                            storiesPagerAdapter.notifyItemChanged(storiesPagerAdapter.dataList.size - list.size)
+                            startPreCaching(list)
+                        }
                     }
-                }
-                else -> {
+                    is ResultData.Refresh -> {
+                        it.data?.let { list ->
+                            storiesPagerAdapter.dataList.clear()
+                            storiesPagerAdapter.dataList.addAll(list)
+                            storiesPagerAdapter.notifyItemChanged(0)
+//                            storiesPagerAdapter.notifyDataSetChanged()
+                            startPreCaching(list)
+                        }
+                    }
+                    is ResultData.Failed -> {
+                        // load failed!
+                        Timber.d("failed : ${it.message}")
+                    }
+                    else -> {
 
+                    }
                 }
             }
-        })
-        model.fetchList()
+        }
+
     }
 
     private fun startPreCaching(dataList: List<TikTok>) {
@@ -87,7 +101,4 @@ class RecommendFragment : Fragment(R.layout.fragment_recommend) {
             .enqueue(preCachingWork)
     }
 
-    companion object {
-        const val TAG = "RecommendFragment"
-    }
 }

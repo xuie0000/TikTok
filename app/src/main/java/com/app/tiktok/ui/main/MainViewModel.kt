@@ -9,7 +9,10 @@ import com.app.tiktok.repository.DataRepository
 import com.app.tiktok.repository.TikTokRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import timber.log.Timber
 import javax.inject.Inject
@@ -20,26 +23,30 @@ class MainViewModel @Inject constructor(
     private val tikTokRepository: TikTokRepository
 ) : ViewModel() {
 
-    private val fetchingIndex: MutableStateFlow<Int> = MutableStateFlow(-1)
-    val listLiveData: LiveData<ResultData<List<TikTok>?>>
+    private val fetchingIndex: MutableStateFlow<Int> = MutableStateFlow(0)
+    private var isFinished = false
 
-    init {
-        Timber.d("init")
-
-        listLiveData = fetchingIndex.asLiveData().switchMap {
-            flow {
-                Timber.d("loading page $it")
-                emit(ResultData.Loading())
-                tikTokRepository.getTikTok(it)?.let {
-                    fetchingIndex.value = it.number
-                    Timber.d("result - page:${it.number}, first:${it.first}, last:${it.last}")
-                    if (it.first) {
-                        emit(ResultData.Refresh(it.content))
-                        return@flow
-                    }
-                    emit(ResultData.Success(it.content))
-                } ?: emit(ResultData.Failed("request failed"))
-            }.asLiveData()
+    @ExperimentalCoroutinesApi
+    val listFlow: Flow<ResultData<List<TikTok>?>> = fetchingIndex.flatMapLatest {
+        flow {
+            Timber.d("index $it")
+            if (isFinished) {
+                emit(ResultData.Failed("fetch is over."))
+                return@flow
+            }
+            emit(ResultData.Loading())
+            tikTokRepository.getTikTok(it)?.let {
+                fetchingIndex.value = it.number
+                Timber.d("result ${it.size} - page:${it.number}, first:${it.first}, last:${it.last}")
+                if (it.first) {
+                    emit(ResultData.Refresh(it.content))
+                    return@flow
+                }
+                if (it.last) {
+                    isFinished = true
+                }
+                emit(ResultData.Success(it.content))
+            } ?: emit(ResultData.Failed("request failed."))
         }
     }
 

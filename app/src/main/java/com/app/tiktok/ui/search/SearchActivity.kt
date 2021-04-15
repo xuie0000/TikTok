@@ -5,7 +5,6 @@ import android.content.Context
 import android.os.AsyncTask
 import android.os.Bundle
 import android.transition.Explode
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -16,6 +15,7 @@ import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import com.app.tiktok.R
 import kotlinx.android.synthetic.main.activity_search.*
+import timber.log.Timber
 
 class SearchActivity : AppCompatActivity() {
 
@@ -61,7 +61,7 @@ class SearchActivity : AppCompatActivity() {
                     moveToPosition(position)
                     getString(1)
                 }
-                Log.d("SearchActivity", "onSuggestionClick info $info")
+                Timber.d("onSuggestionClick info $info")
                 searchView.setQuery(info, true)
                 return true
             }
@@ -111,7 +111,7 @@ class SearchActivity : AppCompatActivity() {
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
-                Log.d("onQueryTextChange", "newText $newText")
+                Timber.d( "newText $newText")
                 search.cancel(true)
                 search.execute(newText)
                 return true

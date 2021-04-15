@@ -1,7 +1,6 @@
 package com.app.tiktok.ui.home.fragment
 
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -18,6 +17,7 @@ import com.app.tiktok.widget.viewpagerlayoutmanager.ViewPagerLayoutManager
 import com.app.tiktok.work.PreCachingService
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_recommend_recycler_view.*
+import timber.log.Timber
 
 @AndroidEntryPoint
 class RecommendRecyclerViewFragment : Fragment(R.layout.fragment_recommend_recycler_view) {
@@ -38,7 +38,7 @@ class RecommendRecyclerViewFragment : Fragment(R.layout.fragment_recommend_recyc
                     if (!value.data.isNullOrEmpty()) {
                         val dataList = value.data
                         storyViewPager = StoryViewAdapter { view, position, item ->
-                            Log.d("RecyclerViewFragment", "position:$position")
+                            Timber.d("position:$position")
                         }
                         val viewPagerLayoutManager = ViewPagerLayoutManager(requireContext())
                         viewPagerLayoutManager.setOnViewPagerListener(storyViewPager.onViewPagerListener)
@@ -46,7 +46,7 @@ class RecommendRecyclerViewFragment : Fragment(R.layout.fragment_recommend_recyc
                         recycler_view.adapter = storyViewPager
                         (recycler_view.layoutManager as ViewPagerLayoutManager).findViewByPosition(2)
 
-                        Log.d("RecyclerViewFragment", "size:${dataList.size}")
+                        Timber.d("size:${dataList.size}")
                         storyViewPager.submitList(dataList)
 
                         startPreCaching(dataList)

@@ -7,7 +7,6 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import com.app.tiktok.app.MyApp
 import com.app.tiktok.model.StoriesDataModel
-import com.app.tiktok.utils.logError
 import com.app.tiktok.widget.viewpagerlayoutmanager.OnViewPagerListener
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
@@ -17,6 +16,7 @@ import com.google.android.exoplayer2.upstream.DataSource
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.upstream.cache.CacheDataSource
 import com.google.common.net.HttpHeaders.USER_AGENT
+import timber.log.Timber
 
 /**
  * @author Jie Xu
@@ -95,7 +95,7 @@ class StoryViewAdapter(
 
     private val playerCallback: Player.EventListener = object : Player.EventListener {
         override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
-            logError("onPlayerStateChanged playbackState: $playbackState")
+            Timber.d("onPlayerStateChanged playbackState: $playbackState")
         }
 
         override fun onPlayerError(error: com.google.android.exoplayer2.ExoPlaybackException) {
@@ -104,7 +104,7 @@ class StoryViewAdapter(
     }
 
     private fun prepareMedia(linkUrl: String) {
-        logError("prepareMedia linkUrl: $linkUrl")
+        Timber.d("prepareMedia linkUrl: $linkUrl")
 
         val uri = Uri.parse(linkUrl)
 

@@ -114,7 +114,7 @@ class StoryViewFragment : Fragment(R.layout.fragment_story_view) {
 
     private val playerCallback: Player.EventListener = object : Player.EventListener {
         override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
-            logError("onPlayerStateChanged playbackState: $playbackState")
+            Timber.d("onPlayerStateChanged playbackState: $playbackState")
         }
 
         override fun onPlayerError(error: com.google.android.exoplayer2.ExoPlaybackException) {
@@ -143,7 +143,7 @@ class StoryViewFragment : Fragment(R.layout.fragment_story_view) {
     }
 
     private fun prepareMedia(linkUrl: String) {
-        logError("prepareMedia linkUrl: $linkUrl")
+        Timber.d("prepareMedia linkUrl: $linkUrl")
 
         val uri = Uri.parse(linkUrl)
 
