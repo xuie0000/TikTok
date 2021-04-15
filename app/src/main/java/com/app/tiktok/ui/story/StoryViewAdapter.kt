@@ -9,12 +9,14 @@ import com.app.tiktok.app.MyApp
 import com.app.tiktok.model.StoriesDataModel
 import com.app.tiktok.utils.logError
 import com.app.tiktok.widget.viewpagerlayoutmanager.OnViewPagerListener
+import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
-import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory
-import com.google.android.exoplayer2.upstream.cache.CacheDataSourceFactory
-import com.google.android.exoplayer2.util.Util
+import com.google.android.exoplayer2.upstream.DataSource
+import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
+import com.google.android.exoplayer2.upstream.cache.CacheDataSource
+import com.google.common.net.HttpHeaders.USER_AGENT
 
 /**
  * @author Jie Xu
@@ -25,7 +27,8 @@ class StoryViewAdapter(
 ) : ListAdapter<StoriesDataModel, StoryViewHolder>(storyDiffCallback) {
 
     private var simplePlayer: SimpleExoPlayer? = null
-    private var cacheDataSourceFactory: CacheDataSourceFactory? = null
+    private var cacheDataSourceFactory: DataSource.Factory? = null
+    private var upstreamFactory: DataSource.Factory? = null
     private val simpleCache = MyApp.simpleCache
     private var storyUrl: String? = null
 
@@ -79,15 +82,15 @@ class StoryViewAdapter(
 
     private fun prepareVideoPlayer() {
         simplePlayer = SimpleExoPlayer.Builder(MyApp.context).build()
-        cacheDataSourceFactory = CacheDataSourceFactory(
-            simpleCache,
-            DefaultHttpDataSourceFactory(
-                Util.getUserAgent(
-                    MyApp.context,
-                    "exo"
-                )
+        upstreamFactory = DefaultDataSourceFactory(MyApp.context, USER_AGENT)
+        cacheDataSourceFactory = CacheDataSource.Factory().apply {
+            setCache(simpleCache)
+            setUpstreamDataSourceFactory(upstreamFactory)
+            setFlags(
+                CacheDataSource.FLAG_BLOCK_ON_CACHE or
+                        CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR
             )
-        )
+        }
     }
 
     private val playerCallback: Player.EventListener = object : Player.EventListener {
@@ -105,9 +108,13 @@ class StoryViewAdapter(
 
         val uri = Uri.parse(linkUrl)
 
-        val mediaSource = ProgressiveMediaSource.Factory(cacheDataSourceFactory).createMediaSource(uri)
+        val mediaSource = ProgressiveMediaSource.Factory(cacheDataSourceFactory!!).createMediaSource(
+            MediaItem.Builder().setUri(uri).build()
+        )
 
-        simplePlayer?.prepare(mediaSource, true, true)
+        simplePlayer?.setMediaSource(mediaSource, true)
+        // FIXME 最新版本这里不能添加`.prepare`，否则出现不播放
+//        simplePlayer?.prepare()
         simplePlayer?.repeatMode = Player.REPEAT_MODE_ONE
         simplePlayer?.playWhenReady = true
         simplePlayer?.addListener(playerCallback)

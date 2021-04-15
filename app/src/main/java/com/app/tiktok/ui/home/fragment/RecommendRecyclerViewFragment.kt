@@ -16,8 +16,10 @@ import com.app.tiktok.ui.story.StoryViewAdapter
 import com.app.tiktok.utils.Constants
 import com.app.tiktok.widget.viewpagerlayoutmanager.ViewPagerLayoutManager
 import com.app.tiktok.work.PreCachingService
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_recommend_recycler_view.*
 
+@AndroidEntryPoint
 class RecommendRecyclerViewFragment : Fragment(R.layout.fragment_recommend_recycler_view) {
     private val homeViewModel by activityViewModels<MainViewModel>()
 

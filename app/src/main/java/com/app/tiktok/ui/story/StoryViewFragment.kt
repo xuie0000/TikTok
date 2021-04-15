@@ -12,22 +12,27 @@ import com.app.tiktok.app.MyApp
 import com.app.tiktok.model.TikTok
 import com.app.tiktok.ui.main.MainViewModel
 import com.app.tiktok.utils.*
+import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.ui.PlayerView
-import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory
-import com.google.android.exoplayer2.upstream.cache.CacheDataSourceFactory
-import com.google.android.exoplayer2.util.Log
-import com.google.android.exoplayer2.util.Util
+import com.google.android.exoplayer2.upstream.DataSource
+import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
+import com.google.android.exoplayer2.upstream.cache.CacheDataSource
+import com.google.common.net.HttpHeaders
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.layout_story_view.*
+import timber.log.Timber
 
+@AndroidEntryPoint
 class StoryViewFragment : Fragment(R.layout.fragment_story_view) {
     private var storyUrl: String? = null
     private var storiesDataModel: TikTok? = null
 
     private var simplePlayer: SimpleExoPlayer? = null
-    private var cacheDataSourceFactory: CacheDataSourceFactory? = null
+    private var cacheDataSourceFactory: DataSource.Factory? = null
+    private var upstreamFactory: DataSource.Factory? = null
     private val simpleCache = MyApp.simpleCache
     private var toPlayVideoPosition: Int = -1
 
@@ -38,8 +43,6 @@ class StoryViewFragment : Fragment(R.layout.fragment_story_view) {
                     putParcelable(Constants.KEY_STORY_DATA, tikTok)
                 }
             }
-
-        const val TAG = "StoryViewFragment"
     }
 
     private val viewModel by activityViewModels<MainViewModel>()
@@ -74,7 +77,7 @@ class StoryViewFragment : Fragment(R.layout.fragment_story_view) {
         }
 
         storyUrl = "http://120.79.19.40:81/${storiesDataModel?.storyUrl}"
-        Log.d(TAG, "url : $storyUrl")
+        Timber.d("url : $storyUrl")
         storyUrl?.let { prepareMedia(it) }
     }
 
@@ -93,13 +96,13 @@ class StoryViewFragment : Fragment(R.layout.fragment_story_view) {
     }
 
     override fun onResume() {
-        Log.d(TAG, "onResume ${storiesDataModel?.storyId}")
+        Timber.d("onResume ${storiesDataModel?.storyId}")
         restartVideo()
         super.onResume()
     }
 
     override fun onPause() {
-        Log.d(TAG, "onPause ${storiesDataModel?.storyId}")
+        Timber.d("onPause ${storiesDataModel?.storyId}")
         pauseVideo()
         super.onPause()
     }
@@ -121,15 +124,15 @@ class StoryViewFragment : Fragment(R.layout.fragment_story_view) {
 
     private fun prepareVideoPlayer() {
         simplePlayer = SimpleExoPlayer.Builder(requireContext()).build()
-        cacheDataSourceFactory = CacheDataSourceFactory(
-            simpleCache,
-            DefaultHttpDataSourceFactory(
-                Util.getUserAgent(
-                    requireContext(),
-                    "exo"
-                )
+        upstreamFactory = DefaultDataSourceFactory(MyApp.context, HttpHeaders.USER_AGENT)
+        cacheDataSourceFactory = CacheDataSource.Factory().apply {
+            setCache(simpleCache)
+            setUpstreamDataSourceFactory(upstreamFactory)
+            setFlags(
+                CacheDataSource.FLAG_BLOCK_ON_CACHE or
+                        CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR
             )
-        )
+        }
     }
 
     private fun getPlayer(): SimpleExoPlayer? {
@@ -144,9 +147,12 @@ class StoryViewFragment : Fragment(R.layout.fragment_story_view) {
 
         val uri = Uri.parse(linkUrl)
 
-        val mediaSource = ProgressiveMediaSource.Factory(cacheDataSourceFactory).createMediaSource(uri)
+        val mediaSource = ProgressiveMediaSource.Factory(cacheDataSourceFactory!!).createMediaSource(
+            MediaItem.Builder().setUri(uri).build()
+        )
 
-        simplePlayer?.prepare(mediaSource, true, true)
+        simplePlayer?.setMediaSource(mediaSource, true)
+        simplePlayer?.prepare()
         simplePlayer?.repeatMode = Player.REPEAT_MODE_ONE
 //        simplePlayer?.playWhenReady = true
         simplePlayer?.addListener(playerCallback)

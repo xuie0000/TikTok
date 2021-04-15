@@ -11,8 +11,10 @@ import com.app.tiktok.base.BaseFragment
 import com.app.tiktok.ui.home.adapter.HomePagerAdapter
 import com.app.tiktok.ui.search.SearchActivity
 import com.google.android.material.tabs.TabLayoutMediator
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_home.*
 
+@AndroidEntryPoint
 class HomeFragment : BaseFragment(R.layout.fragment_home) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

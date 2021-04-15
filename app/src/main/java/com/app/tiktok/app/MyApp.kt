@@ -7,23 +7,23 @@ import com.google.android.exoplayer2.database.ExoDatabaseProvider
 import com.google.android.exoplayer2.upstream.cache.LeastRecentlyUsedCacheEvictor
 import com.google.android.exoplayer2.upstream.cache.SimpleCache
 import dagger.hilt.android.HiltAndroidApp
+import timber.log.Timber
 
 @HiltAndroidApp
-class MyApp: Application() {
+class MyApp : Application() {
     companion object {
-        var simpleCache: SimpleCache? = null
+        lateinit var simpleCache: SimpleCache
         lateinit var context: Context
     }
 
     override fun onCreate() {
         super.onCreate()
         context = this
+        Timber.plant(Timber.DebugTree())
 
         val leastRecentlyUsedCacheEvictor = LeastRecentlyUsedCacheEvictor(900 * 1024 * 1024)
         val databaseProvider: DatabaseProvider = ExoDatabaseProvider(this)
 
-        if (simpleCache == null) {
-            simpleCache = SimpleCache(cacheDir, leastRecentlyUsedCacheEvictor, databaseProvider)
-        }
+        simpleCache = SimpleCache(cacheDir, leastRecentlyUsedCacheEvictor, databaseProvider)
     }
 }

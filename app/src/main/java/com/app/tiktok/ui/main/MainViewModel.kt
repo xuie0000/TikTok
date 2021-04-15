@@ -1,19 +1,21 @@
 package com.app.tiktok.ui.main
 
-import android.util.Log
 import androidx.annotation.MainThread
-import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
 import com.app.tiktok.model.ResultData
 import com.app.tiktok.model.StoriesDataModel
 import com.app.tiktok.model.TikTok
 import com.app.tiktok.repository.DataRepository
 import com.app.tiktok.repository.TikTokRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flow
+import timber.log.Timber
+import javax.inject.Inject
 
-class MainViewModel @ViewModelInject constructor(
+@HiltViewModel
+class MainViewModel @Inject constructor(
     private val dataRepository: DataRepository,
     private val tikTokRepository: TikTokRepository
 ) : ViewModel() {
@@ -22,15 +24,15 @@ class MainViewModel @ViewModelInject constructor(
     val listLiveData: LiveData<ResultData<List<TikTok>?>>
 
     init {
-        Log.d(TAG, "init")
+        Timber.d("init")
 
         listLiveData = fetchingIndex.asLiveData().switchMap {
             flow {
-                Log.d(TAG, "loading page $it")
+                Timber.d("loading page $it")
                 emit(ResultData.Loading())
                 tikTokRepository.getTikTok(it)?.let {
                     fetchingIndex.value = it.number
-                    Log.d(TAG, "result - page:${it.number}, first:${it.first}, last:${it.last}")
+                    Timber.d("result - page:${it.number}, first:${it.first}, last:${it.last}")
                     if (it.first) {
                         emit(ResultData.Refresh(it.content))
                         return@flow
@@ -52,7 +54,4 @@ class MainViewModel @ViewModelInject constructor(
         }.asLiveData(Dispatchers.IO)
     }
 
-    companion object {
-        const val TAG = "MainViewModel"
-    }
 }
