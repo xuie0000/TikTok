@@ -11,7 +11,9 @@ import com.app.tiktok.R
 import com.app.tiktok.app.MyApp
 import com.app.tiktok.model.TikTok
 import com.app.tiktok.ui.main.MainViewModel
-import com.app.tiktok.utils.*
+import com.app.tiktok.utils.Constants
+import com.app.tiktok.utils.formatNumberAsReadableFormat
+import com.app.tiktok.utils.setTextOrHide
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.SimpleExoPlayer
@@ -27,166 +29,158 @@ import timber.log.Timber
 
 @AndroidEntryPoint
 class StoryViewFragment : Fragment(R.layout.fragment_story_view) {
-    private var storyUrl: String? = null
-    private var storiesDataModel: TikTok? = null
 
-    private var simplePlayer: SimpleExoPlayer? = null
-    private var cacheDataSourceFactory: DataSource.Factory? = null
-    private var upstreamFactory: DataSource.Factory? = null
-    private val simpleCache = MyApp.simpleCache
-    private var toPlayVideoPosition: Int = -1
+  private lateinit var storiesData: TikTok
 
-    companion object {
-        fun newInstance(tikTok: TikTok) = StoryViewFragment()
-            .apply {
-                arguments = Bundle().apply {
-                    putParcelable(Constants.KEY_STORY_DATA, tikTok)
-                }
-            }
-    }
-
-    private val viewModel by activityViewModels<MainViewModel>()
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        storiesDataModel = arguments?.getParcelable(Constants.KEY_STORY_DATA)
-        setData()
-    }
-
-    private fun setData() {
-        text_view_account_handle.setTextOrHide(value = storiesDataModel?.userName)
-        text_view_video_description.setTextOrHide(value = storiesDataModel?.storyDescription)
-        text_view_music_title.setTextOrHide(value = storiesDataModel?.musicCoverTitle)
-
-        image_view_option_comment_title?.text = storiesDataModel?.commentsCount?.formatNumberAsReadableFormat()
-        image_view_option_like_title?.text = storiesDataModel?.likesCount?.formatNumberAsReadableFormat()
-
-        image_view_profile_pic?.loadCenterCropImageFromUrl(storiesDataModel?.userProfilePicUrl)
-
-        text_view_music_title.isSelected = true
-        button_play_status.visibility = View.GONE
-
-        val simplePlayer = getPlayer()
-        player_view_story.player = simplePlayer
-        player_view_story?.videoSurfaceView?.setOnClickListener {
-            switchVideoStatus(simplePlayer)
+  companion object {
+    fun newInstance(tikTok: TikTok) = StoryViewFragment()
+      .apply {
+        arguments = Bundle().apply {
+          putParcelable(Constants.KEY_STORY_DATA, tikTok)
         }
-        button_play_status?.setOnClickListener {
-            switchVideoStatus(simplePlayer)
-        }
+      }
+  }
 
-        storyUrl = "http://120.79.19.40:81/${storiesDataModel?.storyUrl}"
-        Timber.d("url : $storyUrl")
-        storyUrl?.let { prepareMedia(it) }
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    storiesData = arguments?.getParcelable(Constants.KEY_STORY_DATA)!!
+  }
+
+  private val viewModel by activityViewModels<MainViewModel>()
+
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
+
+    text_view_account_handle.setTextOrHide(value = storiesData.userName)
+    text_view_video_description.setTextOrHide(value = storiesData.storyDescription)
+    text_view_music_title.setTextOrHide(value = storiesData.musicCoverTitle)
+
+    image_view_option_comment_title.text = storiesData.commentsCount.formatNumberAsReadableFormat()
+    image_view_option_like_title.text = storiesData.likesCount.formatNumberAsReadableFormat()
+
+//    image_view_profile_pic.loadCenterCropImageFromUrl(storiesDataModel.userProfilePicUrl)
+
+    text_view_music_title.isSelected = true
+    button_play_status.visibility = View.GONE
+
+    prepareVideoPlayer()
+
+    player_view_story.player = simplePlayer
+    player_view_story.videoSurfaceView?.setOnClickListener {
+      switchVideoStatus()
+    }
+    button_play_status.setOnClickListener {
+      switchVideoStatus()
     }
 
-    private fun switchVideoStatus(simplePlayer: SimpleExoPlayer?) {
-        simplePlayer?.run {
-            if (isPlaying) {
-                pauseVideo()
-                button_play_status?.visibility = View.VISIBLE
-                ObjectAnimator.ofFloat(button_play_status, "scaleX", 2.0f, 1.0f).start()
-                ObjectAnimator.ofFloat(button_play_status, "scaleY", 2.0f, 1.0f).start()
-            } else {
-                playVideo()
-                button_play_status?.visibility = View.GONE
-            }
-        }
-    }
+    storyUrl = "http://120.79.19.40:81/${storiesData.storyUrl}"
+    Timber.d("url : $storyUrl")
+    prepareMedia(storyUrl)
+  }
 
-    override fun onResume() {
-        Timber.d("onResume ${storiesDataModel?.storyId}")
-        restartVideo()
-        super.onResume()
-    }
+  private lateinit var storyUrl: String
+  private lateinit var simplePlayer: SimpleExoPlayer
+  private lateinit var cacheDataSourceFactory: DataSource.Factory
+  private val simpleCache = MyApp.simpleCache
+  private var toPlayVideoPosition: Int = -1
 
-    override fun onPause() {
-        Timber.d("onPause ${storiesDataModel?.storyId}")
+
+  private fun switchVideoStatus() {
+    simplePlayer.run {
+      if (isPlaying) {
         pauseVideo()
-        super.onPause()
-    }
-
-    override fun onDestroy() {
-        releasePlayer()
-        super.onDestroy()
-    }
-
-    private val playerCallback: Player.EventListener = object : Player.EventListener {
-        override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
-            Timber.d("onPlayerStateChanged playbackState: $playbackState")
-        }
-
-        override fun onPlayerError(error: com.google.android.exoplayer2.ExoPlaybackException) {
-            super.onPlayerError(error)
-        }
-    }
-
-    private fun prepareVideoPlayer() {
-        simplePlayer = SimpleExoPlayer.Builder(requireContext()).build()
-        upstreamFactory = DefaultDataSourceFactory(MyApp.context, HttpHeaders.USER_AGENT)
-        cacheDataSourceFactory = CacheDataSource.Factory().apply {
-            setCache(simpleCache)
-            setUpstreamDataSourceFactory(upstreamFactory)
-            setFlags(
-                CacheDataSource.FLAG_BLOCK_ON_CACHE or
-                        CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR
-            )
-        }
-    }
-
-    private fun getPlayer(): SimpleExoPlayer? {
-        if (simplePlayer == null) {
-            prepareVideoPlayer()
-        }
-        return simplePlayer
-    }
-
-    private fun prepareMedia(linkUrl: String) {
-        Timber.d("prepareMedia linkUrl: $linkUrl")
-
-        val uri = Uri.parse(linkUrl)
-
-        val mediaSource = ProgressiveMediaSource.Factory(cacheDataSourceFactory!!).createMediaSource(
-            MediaItem.Builder().setUri(uri).build()
-        )
-
-        simplePlayer?.setMediaSource(mediaSource, true)
-        simplePlayer?.prepare()
-        simplePlayer?.repeatMode = Player.REPEAT_MODE_ONE
-//        simplePlayer?.playWhenReady = true
-        simplePlayer?.addListener(playerCallback)
-
-        toPlayVideoPosition = -1
-    }
-
-    private fun setArtwork(drawable: Drawable, playerView: PlayerView) {
-        playerView.useArtwork = true
-        playerView.defaultArtwork = drawable
-    }
-
-    private fun playVideo() {
-        simplePlayer?.playWhenReady = true
-    }
-
-    private fun restartVideo() {
+        button_play_status?.visibility = View.VISIBLE
+        ObjectAnimator.ofFloat(button_play_status, "scaleX", 2.0f, 1.0f).start()
+        ObjectAnimator.ofFloat(button_play_status, "scaleY", 2.0f, 1.0f).start()
+      } else {
+        playVideo()
         button_play_status?.visibility = View.GONE
-        if (simplePlayer == null) {
-            storyUrl?.let { prepareMedia(it) }
-            simplePlayer?.playWhenReady = true
-        } else {
-            simplePlayer?.seekToDefaultPosition()
-            simplePlayer?.playWhenReady = true
-        }
+      }
+    }
+  }
+
+  override fun onResume() {
+    Timber.d("onResume ${storiesData.storyId}")
+    restartVideo()
+    super.onResume()
+  }
+
+  override fun onPause() {
+    Timber.d("onPause ${storiesData.storyId}")
+    pauseVideo()
+    super.onPause()
+  }
+
+  override fun onDestroyView() {
+    super.onDestroyView()
+    releasePlayer()
+  }
+
+  private val playerCallback: Player.EventListener = object : Player.EventListener {
+    override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
+      Timber.d("onPlayerStateChanged: $playWhenReady-$playbackState")
     }
 
-    private fun pauseVideo() {
-        simplePlayer?.playWhenReady = false
+    override fun onPlayerError(error: com.google.android.exoplayer2.ExoPlaybackException) {
+      super.onPlayerError(error)
+      Timber.d("onPlayerError: $error")
     }
+  }
 
-    private fun releasePlayer() {
-        simplePlayer?.stop(true)
-        simplePlayer?.release()
+  private fun prepareVideoPlayer() {
+    simplePlayer = SimpleExoPlayer.Builder(requireContext()).build()
+
+    val upstreamFactory = DefaultDataSourceFactory(MyApp.context, HttpHeaders.USER_AGENT)
+    cacheDataSourceFactory = CacheDataSource.Factory().apply {
+      setCache(simpleCache)
+      setUpstreamDataSourceFactory(upstreamFactory)
+      setFlags(
+        CacheDataSource.FLAG_BLOCK_ON_CACHE or
+          CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR
+      )
     }
+  }
+
+  private fun prepareMedia(linkUrl: String) {
+    Timber.d("prepareMedia linkUrl: $linkUrl")
+
+    val uri = Uri.parse(linkUrl)
+
+    val mediaSource = ProgressiveMediaSource.Factory(cacheDataSourceFactory).createMediaSource(
+      MediaItem.Builder().setUri(uri).build()
+    )
+
+    simplePlayer.setMediaSource(mediaSource, true)
+    simplePlayer.prepare()
+    simplePlayer.repeatMode = Player.REPEAT_MODE_ONE
+    simplePlayer.playWhenReady = true
+    simplePlayer.addListener(playerCallback)
+
+    toPlayVideoPosition = -1
+  }
+
+  private fun setArtwork(drawable: Drawable, playerView: PlayerView) {
+    playerView.useArtwork = true
+    playerView.defaultArtwork = drawable
+  }
+
+  private fun playVideo() {
+    simplePlayer.playWhenReady = true
+  }
+
+  private fun restartVideo() {
+    button_play_status.visibility = View.GONE
+    simplePlayer.seekToDefaultPosition()
+    simplePlayer.playWhenReady = true
+  }
+
+  private fun pauseVideo() {
+    simplePlayer.playWhenReady = false
+  }
+
+  private fun releasePlayer() {
+    simplePlayer.stop()
+    simplePlayer.release()
+  }
 
 }
