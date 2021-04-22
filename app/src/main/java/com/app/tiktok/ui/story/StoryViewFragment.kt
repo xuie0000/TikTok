@@ -81,8 +81,6 @@ class StoryViewFragment : Fragment(R.layout.fragment_story_view) {
   private lateinit var storyUrl: String
   private lateinit var simplePlayer: SimpleExoPlayer
   private lateinit var cacheDataSourceFactory: DataSource.Factory
-  private val simpleCache = MyApp.simpleCache
-  private var toPlayVideoPosition: Int = -1
 
 
   private fun switchVideoStatus() {
@@ -132,7 +130,7 @@ class StoryViewFragment : Fragment(R.layout.fragment_story_view) {
 
     val upstreamFactory = DefaultDataSourceFactory(MyApp.context, HttpHeaders.USER_AGENT)
     cacheDataSourceFactory = CacheDataSource.Factory().apply {
-      setCache(simpleCache)
+      setCache(MyApp.simpleCache)
       setUpstreamDataSourceFactory(upstreamFactory)
       setFlags(
         CacheDataSource.FLAG_BLOCK_ON_CACHE or
@@ -156,7 +154,6 @@ class StoryViewFragment : Fragment(R.layout.fragment_story_view) {
     simplePlayer.playWhenReady = true
     simplePlayer.addListener(playerCallback)
 
-    toPlayVideoPosition = -1
   }
 
   private fun setArtwork(drawable: Drawable, playerView: PlayerView) {
