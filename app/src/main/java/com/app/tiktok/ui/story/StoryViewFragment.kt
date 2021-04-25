@@ -13,6 +13,7 @@ import com.app.tiktok.model.TikTok
 import com.app.tiktok.ui.main.MainViewModel
 import com.app.tiktok.utils.Constants
 import com.app.tiktok.utils.formatNumberAsReadableFormat
+import com.app.tiktok.utils.remoteUrl
 import com.app.tiktok.utils.setTextOrHide
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
@@ -73,9 +74,7 @@ class StoryViewFragment : Fragment(R.layout.fragment_story_view) {
       switchVideoStatus()
     }
 
-    storyUrl = "http://120.79.19.40:81/${storiesData.storyUrl}"
-    Timber.d("url : $storyUrl")
-    prepareMedia(storyUrl)
+    prepareMedia(storiesData.remoteUrl())
   }
 
   private lateinit var storyUrl: String

@@ -16,6 +16,7 @@ import com.app.tiktok.model.TikTok
 import com.app.tiktok.ui.home.adapter.StoriesPagerAdapter
 import com.app.tiktok.ui.main.MainViewModel
 import com.app.tiktok.utils.Constants
+import com.app.tiktok.utils.remoteUrl
 import com.app.tiktok.work.PreCachingService
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_recommend.*
@@ -92,7 +93,7 @@ class RecommendFragment : Fragment(R.layout.fragment_recommend) {
   private fun startPreCaching(dataList: List<TikTok>) {
     val urlList = arrayOfNulls<String>(dataList.size)
     dataList.mapIndexed { index, storiesDataModel ->
-      urlList[index] = "http://120.79.19.40:81/${storiesDataModel.storyUrl}"
+      urlList[index] = storiesDataModel.remoteUrl()
     }
     val inputData = Data.Builder().putStringArray(Constants.KEY_STORIES_LIST_DATA, urlList).build()
     val preCachingWork = OneTimeWorkRequestBuilder<PreCachingService>().setInputData(inputData)
