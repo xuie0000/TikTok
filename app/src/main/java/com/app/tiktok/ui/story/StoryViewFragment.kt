@@ -128,7 +128,7 @@ class StoryViewFragment : Fragment(R.layout.fragment_story_view) {
   private fun prepareVideoPlayer() {
     simplePlayer = SimpleExoPlayer.Builder(requireContext()).build()
 
-    val upstreamFactory = DefaultDataSourceFactory(MyApp.context, HttpHeaders.USER_AGENT)
+    val upstreamFactory = DefaultDataSourceFactory(requireContext(), HttpHeaders.USER_AGENT)
     cacheDataSourceFactory = CacheDataSource.Factory().apply {
       setCache(MyApp.simpleCache)
       setUpstreamDataSourceFactory(upstreamFactory)

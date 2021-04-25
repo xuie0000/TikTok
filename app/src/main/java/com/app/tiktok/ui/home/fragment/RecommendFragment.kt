@@ -62,7 +62,7 @@ class RecommendFragment : Fragment(R.layout.fragment_recommend) {
           is ResultData.Success -> {
             it.data?.let { list ->
               storiesPagerAdapter.dataList.addAll(list)
-//                            storiesPagerAdapter.notifyDataSetChanged()
+//              storiesPagerAdapter.notifyDataSetChanged()
               storiesPagerAdapter.notifyItemChanged(storiesPagerAdapter.dataList.size - list.size)
               startPreCaching(list)
             }
@@ -72,7 +72,7 @@ class RecommendFragment : Fragment(R.layout.fragment_recommend) {
               storiesPagerAdapter.dataList.clear()
               storiesPagerAdapter.dataList.addAll(list)
               storiesPagerAdapter.notifyItemChanged(0)
-//                            storiesPagerAdapter.notifyDataSetChanged()
+//              storiesPagerAdapter.notifyDataSetChanged()
               startPreCaching(list)
             }
           }

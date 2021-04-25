@@ -16,10 +16,10 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.joinAll
 import timber.log.Timber
 
-class PreCachingService(appContext: Context, params: WorkerParameters) : CoroutineWorker(appContext, params) {
+class PreCachingService(private val appContext: Context, params: WorkerParameters) : CoroutineWorker(appContext, params) {
 
   override suspend fun doWork(): Result = coroutineScope {
-    val upstreamFactory = DefaultDataSourceFactory(MyApp.context, HttpHeaders.USER_AGENT)
+    val upstreamFactory = DefaultDataSourceFactory(appContext, HttpHeaders.USER_AGENT)
     val cacheDataSource = CacheDataSource.Factory().apply {
       setCache(MyApp.simpleCache)
       setUpstreamDataSourceFactory(upstreamFactory)
@@ -34,11 +34,11 @@ class PreCachingService(appContext: Context, params: WorkerParameters) : Corouti
     val jobs = dataList?.map { data ->
       async {
         val dataUri = Uri.parse(data)
-        val dataSpec = DataSpec(dataUri, 0, 500 * 1024, null)
+        val dataSpec = DataSpec(dataUri, 0, 500 * 1024)
 
         preloadVideo(dataSpec, cacheDataSource) { requestLength: Long, bytesCached: Long, newBytesCached: Long ->
           val downloadPercentage = (bytesCached * 100.0 / requestLength)
-          Timber.d("downloadPercentage: $downloadPercentage")
+          Timber.d("downloadPercentage: $downloadPercentage, url: $data")
         }
       }
     }
@@ -51,11 +51,11 @@ class PreCachingService(appContext: Context, params: WorkerParameters) : Corouti
     upstream: CacheDataSource,
     progressListener: CacheWriter.ProgressListener
   ) {
-    Timber.d("preloadVideo")
+    Timber.d("preloadVideo ${dataSpec.uri}")
     try {
       CacheWriter(upstream, dataSpec, true, null, progressListener).cache()
     } catch (e: Exception) {
-      e.printStackTrace()
+      Timber.e("error: ${e.message}")
     }
   }
 }
