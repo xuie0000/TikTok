@@ -5,7 +5,7 @@ import com.app.tiktok.model.StoriesDataModel
 import javax.inject.Inject
 
 class DataRepository @Inject constructor(private val mock: Mock) {
-    fun getStoriesData(): ArrayList<StoriesDataModel>? {
-        return mock.loadMockData()
-    }
+  fun getStoriesData(): ArrayList<StoriesDataModel>? {
+    return mock.loadMockData()
+  }
 }

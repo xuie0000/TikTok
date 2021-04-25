@@ -18,35 +18,35 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
 
-    @Provides
-    @Singleton
-    fun provideContext(@ApplicationContext context: Context): Context {
-        return context
-    }
+  @Provides
+  @Singleton
+  fun provideContext(@ApplicationContext context: Context): Context {
+    return context
+  }
 
-    @Provides
-    @Singleton
-    fun provideOkHttpClient(): OkHttpClient {
-        return OkHttpClient.Builder()
-            .addInterceptor(HttpLoggingInterceptor().apply {
-                level = HttpLoggingInterceptor.Level.BODY
-            })
-            .build()
-    }
+  @Provides
+  @Singleton
+  fun provideOkHttpClient(): OkHttpClient {
+    return OkHttpClient.Builder()
+      .addInterceptor(HttpLoggingInterceptor().apply {
+        level = HttpLoggingInterceptor.Level.BODY
+      })
+      .build()
+  }
 
-    @Provides
-    @Singleton
-    fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
-        return Retrofit.Builder()
-            .client(okHttpClient)
-            .baseUrl("http://120.79.19.40:8080")
-            .addConverterFactory(GsonConverterFactory.create(Gson()))
-            .build()
-    }
+  @Provides
+  @Singleton
+  fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
+    return Retrofit.Builder()
+      .client(okHttpClient)
+      .baseUrl("http://120.79.19.40:8080")
+      .addConverterFactory(GsonConverterFactory.create(Gson()))
+      .build()
+  }
 
-    @Provides
-    @Singleton
-    fun provideApi(retrofit: Retrofit): TikTokApi {
-        return retrofit.create(TikTokApi::class.java)
-    }
+  @Provides
+  @Singleton
+  fun provideApi(retrofit: Retrofit): TikTokApi {
+    return retrofit.create(TikTokApi::class.java)
+  }
 }

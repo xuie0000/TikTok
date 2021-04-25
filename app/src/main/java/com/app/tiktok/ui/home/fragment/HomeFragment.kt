@@ -17,29 +17,29 @@ import kotlinx.android.synthetic.main.fragment_home.*
 @AndroidEntryPoint
 class HomeFragment : BaseFragment(R.layout.fragment_home) {
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
 
-        pager.adapter = HomePagerAdapter(this)
-        pager.offscreenPageLimit = 3
+    pager.adapter = HomePagerAdapter(this)
+    pager.offscreenPageLimit = 3
 
-        val tabTitles = listOf("推荐", "关注", "同城")
-        TabLayoutMediator(tab, pager) { tab, position ->
-            tab.text = tabTitles[position]
-        }.attach()
+    val tabTitles = listOf("推荐", "关注", "同城")
+    TabLayoutMediator(tab, pager) { tab, position ->
+      tab.text = tabTitles[position]
+    }.attach()
 
-        initAction()
-    }
+    initAction()
+  }
 
-    private fun initAction() {
-        iv_online.setOnClickListener { Toast.makeText(requireContext(), "直播", Toast.LENGTH_SHORT).show() }
-        iv_search.setOnClickListener { startSearchActivity() }
-    }
+  private fun initAction() {
+    iv_online.setOnClickListener { Toast.makeText(requireContext(), "直播", Toast.LENGTH_SHORT).show() }
+    iv_search.setOnClickListener { startSearchActivity() }
+  }
 
-    private fun startSearchActivity() {
-        val activity = requireActivity()
-        val options = ActivityOptions.makeSceneTransitionAnimation(activity)
-        ActivityCompat.startActivity(activity, Intent(activity, SearchActivity::class.java), options.toBundle())
-    }
+  private fun startSearchActivity() {
+    val activity = requireActivity()
+    val options = ActivityOptions.makeSceneTransitionAnimation(activity)
+    ActivityCompat.startActivity(activity, Intent(activity, SearchActivity::class.java), options.toBundle())
+  }
 
 }

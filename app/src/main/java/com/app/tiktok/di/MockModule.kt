@@ -11,8 +11,8 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 @InstallIn(ActivityRetainedComponent::class)
 @Module
 object MockModule {
-    @Provides
-    fun providesMockDependency(@ApplicationContext context: Context): Mock {
-        return Mock(context)
-    }
+  @Provides
+  fun providesMockDependency(@ApplicationContext context: Context): Mock {
+    return Mock(context)
+  }
 }

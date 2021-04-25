@@ -19,46 +19,46 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    private val dataRepository: DataRepository,
-    private val tikTokRepository: TikTokRepository
+  private val dataRepository: DataRepository,
+  private val tikTokRepository: TikTokRepository
 ) : ViewModel() {
 
-    private val fetchingIndex: MutableStateFlow<Int> = MutableStateFlow(0)
-    private var isFinished = false
+  private val fetchingIndex: MutableStateFlow<Int> = MutableStateFlow(0)
+  private var isFinished = false
 
-    @ExperimentalCoroutinesApi
-    val listFlow: Flow<ResultData<List<TikTok>?>> = fetchingIndex.flatMapLatest {
-        flow {
-            Timber.d("index $it")
-            if (isFinished) {
-                emit(ResultData.Failed("fetch is over."))
-                return@flow
-            }
-            emit(ResultData.Loading())
-            tikTokRepository.getTikTok(it)?.let {
-                fetchingIndex.value = it.number
-                Timber.d("result ${it.size} - page:${it.number}, first:${it.first}, last:${it.last}")
-                if (it.first) {
-                    emit(ResultData.Refresh(it.content))
-                    return@flow
-                }
-                if (it.last) {
-                    isFinished = true
-                }
-                emit(ResultData.Success(it.content))
-            } ?: emit(ResultData.Failed("request failed."))
+  @ExperimentalCoroutinesApi
+  val listFlow: Flow<ResultData<List<TikTok>?>> = fetchingIndex.flatMapLatest {
+    flow {
+      Timber.d("index $it")
+      if (isFinished) {
+        emit(ResultData.Failed("fetch is over."))
+        return@flow
+      }
+      emit(ResultData.Loading())
+      tikTokRepository.getTikTok(it)?.let {
+        fetchingIndex.value = it.number
+        Timber.d("result ${it.size} - page:${it.number}, first:${it.first}, last:${it.last}")
+        if (it.first) {
+          emit(ResultData.Refresh(it.content))
+          return@flow
         }
+        if (it.last) {
+          isFinished = true
+        }
+        emit(ResultData.Success(it.content))
+      } ?: emit(ResultData.Failed("request failed."))
     }
+  }
 
-    @MainThread
-    fun fetchList() = fetchingIndex.value++
+  @MainThread
+  fun fetchList() = fetchingIndex.value++
 
-    // the origin data list method
-    fun getDataList(): LiveData<ResultData<ArrayList<StoriesDataModel>?>> {
-        return flow {
-            emit(ResultData.Loading())
-            emit(ResultData.Success(dataRepository.getStoriesData()))
-        }.asLiveData(Dispatchers.IO)
-    }
+  // the origin data list method
+  fun getDataList(): LiveData<ResultData<ArrayList<StoriesDataModel>?>> {
+    return flow {
+      emit(ResultData.Loading())
+      emit(ResultData.Success(dataRepository.getStoriesData()))
+    }.asLiveData(Dispatchers.IO)
+  }
 
 }

@@ -12,13 +12,13 @@ import dagger.hilt.android.components.ActivityRetainedComponent
 @InstallIn(ActivityRetainedComponent::class)
 @Module
 object RepositoryModule {
-    @Provides
-    fun providesDataRepository(mock: Mock): DataRepository {
-        return DataRepository(mock)
-    }
+  @Provides
+  fun providesDataRepository(mock: Mock): DataRepository {
+    return DataRepository(mock)
+  }
 
-    @Provides
-    fun providesApiRepository(api: TikTokApi): TikTokRepository {
-        return TikTokRepository(api)
-    }
+  @Provides
+  fun providesApiRepository(api: TikTokApi): TikTokRepository {
+    return TikTokRepository(api)
+  }
 }

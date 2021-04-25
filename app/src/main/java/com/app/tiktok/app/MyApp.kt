@@ -11,19 +11,19 @@ import timber.log.Timber
 
 @HiltAndroidApp
 class MyApp : Application() {
-    companion object {
-        lateinit var simpleCache: SimpleCache
-        lateinit var context: Context
-    }
+  companion object {
+    lateinit var simpleCache: SimpleCache
+    lateinit var context: Context
+  }
 
-    override fun onCreate() {
-        super.onCreate()
-        context = this
-        Timber.plant(Timber.DebugTree())
+  override fun onCreate() {
+    super.onCreate()
+    context = this
+    Timber.plant(Timber.DebugTree())
 
-        val leastRecentlyUsedCacheEvictor = LeastRecentlyUsedCacheEvictor(900 * 1024 * 1024)
-        val databaseProvider: DatabaseProvider = ExoDatabaseProvider(this)
+    val leastRecentlyUsedCacheEvictor = LeastRecentlyUsedCacheEvictor(900 * 1024 * 1024)
+    val databaseProvider: DatabaseProvider = ExoDatabaseProvider(this)
 
-        simpleCache = SimpleCache(cacheDir, leastRecentlyUsedCacheEvictor, databaseProvider)
-    }
+    simpleCache = SimpleCache(cacheDir, leastRecentlyUsedCacheEvictor, databaseProvider)
+  }
 }
