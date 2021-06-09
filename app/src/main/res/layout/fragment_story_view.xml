@@ -6,6 +6,7 @@
     tools:context=".ui.story.StoryViewFragment">
 
     <include
-        layout="@layout/layout_story_view"/>
+        android:id="@+id/story"
+        layout="@layout/layout_story_view" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -7,8 +7,11 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import by.kirich1409.viewbindingdelegate.viewBinding
 import com.app.tiktok.R
 import com.app.tiktok.app.MyApp
+import com.app.tiktok.databinding.FragmentRecommendBinding
+import com.app.tiktok.databinding.FragmentStoryViewBinding
 import com.app.tiktok.model.TikTok
 import com.app.tiktok.ui.main.MainViewModel
 import com.app.tiktok.utils.Constants
@@ -25,12 +28,12 @@ import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.upstream.cache.CacheDataSource
 import com.google.common.net.HttpHeaders
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.layout_story_view.*
 import timber.log.Timber
 
 @AndroidEntryPoint
 class StoryViewFragment : Fragment(R.layout.fragment_story_view) {
 
+  private val binding: FragmentStoryViewBinding by viewBinding()
   private lateinit var storiesData: TikTok
 
   companion object {
@@ -52,25 +55,25 @@ class StoryViewFragment : Fragment(R.layout.fragment_story_view) {
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
 
-    text_view_account_handle.setTextOrHide(value = storiesData.userName)
-    text_view_video_description.setTextOrHide(value = storiesData.storyDescription)
-    text_view_music_title.setTextOrHide(value = storiesData.musicCoverTitle)
+    binding.story.textViewAccountHandle.setTextOrHide(value = storiesData.userName)
+    binding.story.textViewVideoDescription.setTextOrHide(value = storiesData.storyDescription)
+    binding.story.textViewMusicTitle.setTextOrHide(value = storiesData.musicCoverTitle)
 
-    image_view_option_comment_title.text = storiesData.commentsCount.formatNumberAsReadableFormat()
-    image_view_option_like_title.text = storiesData.likesCount.formatNumberAsReadableFormat()
+    binding.story.imageViewOptionCommentTitle.text = storiesData.commentsCount.formatNumberAsReadableFormat()
+    binding.story.imageViewOptionLikeTitle.text = storiesData.likesCount.formatNumberAsReadableFormat()
 
 //    image_view_profile_pic.loadCenterCropImageFromUrl(storiesDataModel.userProfilePicUrl)
 
-    text_view_music_title.isSelected = true
-    button_play_status.visibility = View.GONE
+    binding.story.textViewMusicTitle.isSelected = true
+    binding.story.buttonPlayStatus.visibility = View.GONE
 
     prepareVideoPlayer()
 
-    player_view_story.player = simplePlayer
-    player_view_story.videoSurfaceView?.setOnClickListener {
+    binding.story.playerViewStory.player = simplePlayer
+    binding.story.playerViewStory.videoSurfaceView?.setOnClickListener {
       switchVideoStatus()
     }
-    button_play_status.setOnClickListener {
+    binding.story.buttonPlayStatus.setOnClickListener {
       switchVideoStatus()
     }
 
@@ -86,12 +89,12 @@ class StoryViewFragment : Fragment(R.layout.fragment_story_view) {
     simplePlayer.run {
       if (isPlaying) {
         pauseVideo()
-        button_play_status?.visibility = View.VISIBLE
-        ObjectAnimator.ofFloat(button_play_status, "scaleX", 2.0f, 1.0f).start()
-        ObjectAnimator.ofFloat(button_play_status, "scaleY", 2.0f, 1.0f).start()
+        binding.story.buttonPlayStatus.visibility = View.VISIBLE
+        ObjectAnimator.ofFloat(binding.story.buttonPlayStatus, "scaleX", 2.0f, 1.0f).start()
+        ObjectAnimator.ofFloat(binding.story.buttonPlayStatus, "scaleY", 2.0f, 1.0f).start()
       } else {
         playVideo()
-        button_play_status?.visibility = View.GONE
+        binding.story.buttonPlayStatus.visibility = View.GONE
       }
     }
   }
@@ -165,7 +168,7 @@ class StoryViewFragment : Fragment(R.layout.fragment_story_view) {
   }
 
   private fun restartVideo() {
-    button_play_status.visibility = View.GONE
+    binding.story.buttonPlayStatus.visibility = View.GONE
     simplePlayer.seekToDefaultPosition()
     simplePlayer.playWhenReady = true
   }

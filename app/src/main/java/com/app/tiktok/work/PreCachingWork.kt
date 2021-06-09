@@ -53,7 +53,7 @@ class PreCachingService(private val appContext: Context, params: WorkerParameter
   ) {
     Timber.d("preloadVideo ${dataSpec.uri}")
     try {
-      CacheWriter(upstream, dataSpec, true, null, progressListener).cache()
+      CacheWriter(upstream, dataSpec, null, progressListener).cache()
     } catch (e: Exception) {
       Timber.e("error: ${e.message}")
     }

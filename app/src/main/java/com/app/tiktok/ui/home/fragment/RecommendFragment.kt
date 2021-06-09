@@ -10,7 +10,9 @@ import androidx.viewpager2.widget.ViewPager2
 import androidx.work.Data
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
+import by.kirich1409.viewbindingdelegate.viewBinding
 import com.app.tiktok.R
+import com.app.tiktok.databinding.FragmentRecommendBinding
 import com.app.tiktok.model.ResultData
 import com.app.tiktok.model.TikTok
 import com.app.tiktok.ui.home.adapter.StoriesPagerAdapter
@@ -19,7 +21,6 @@ import com.app.tiktok.utils.Constants
 import com.app.tiktok.utils.remoteUrl
 import com.app.tiktok.work.PreCachingService
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.fragment_recommend.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.flow.collect
@@ -27,6 +28,8 @@ import timber.log.Timber
 
 @AndroidEntryPoint
 class RecommendFragment : Fragment(R.layout.fragment_recommend) {
+
+  private val binding: FragmentRecommendBinding by viewBinding()
   private val model by activityViewModels<MainViewModel>()
 
   private lateinit var storiesPagerAdapter: StoriesPagerAdapter
@@ -41,8 +44,8 @@ class RecommendFragment : Fragment(R.layout.fragment_recommend) {
       stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
     }
 
-    view_pager_stories.adapter = storiesPagerAdapter
-    view_pager_stories.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+    binding.viewPagerStories.adapter = storiesPagerAdapter
+    binding.viewPagerStories.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
       override fun onPageSelected(position: Int) {
         super.onPageSelected(position)
         Timber.d("selected $position")

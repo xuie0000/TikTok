@@ -6,25 +6,28 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
+import by.kirich1409.viewbindingdelegate.viewBinding
 import com.app.tiktok.R
 import com.app.tiktok.base.BaseFragment
+import com.app.tiktok.databinding.FragmentHomeBinding
 import com.app.tiktok.ui.home.adapter.HomePagerAdapter
 import com.app.tiktok.ui.search.SearchActivity
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.fragment_home.*
 
 @AndroidEntryPoint
 class HomeFragment : BaseFragment(R.layout.fragment_home) {
 
+  private val binding: FragmentHomeBinding by viewBinding()
+
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
 
-    pager.adapter = HomePagerAdapter(this)
-    pager.offscreenPageLimit = 3
+    binding.pager.adapter = HomePagerAdapter(this)
+    binding.pager.offscreenPageLimit = 3
 
     val tabTitles = listOf("推荐", "关注", "同城")
-    TabLayoutMediator(tab, pager) { tab, position ->
+    TabLayoutMediator(binding.tab, binding.pager) { tab, position ->
       tab.text = tabTitles[position]
     }.attach()
 
@@ -32,8 +35,8 @@ class HomeFragment : BaseFragment(R.layout.fragment_home) {
   }
 
   private fun initAction() {
-    iv_online.setOnClickListener { Toast.makeText(requireContext(), "直播", Toast.LENGTH_SHORT).show() }
-    iv_search.setOnClickListener { startSearchActivity() }
+    binding.ivOnline.setOnClickListener { Toast.makeText(requireContext(), "直播", Toast.LENGTH_SHORT).show() }
+    binding.ivSearch.setOnClickListener { startSearchActivity() }
   }
 
   private fun startSearchActivity() {

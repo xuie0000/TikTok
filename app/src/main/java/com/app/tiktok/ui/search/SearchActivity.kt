@@ -14,16 +14,20 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import com.app.tiktok.R
-import kotlinx.android.synthetic.main.activity_search.*
+import com.app.tiktok.databinding.ActivitySearchBinding
 import timber.log.Timber
 
 class SearchActivity : AppCompatActivity() {
 
+  private lateinit var binding: ActivitySearchBinding
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     window.enterTransition = Explode()
-    setContentView(R.layout.activity_search)
-    setSupportActionBar(toolbar)
+
+    binding = ActivitySearchBinding.inflate(layoutInflater)
+    setContentView(binding.root)
+    setSupportActionBar(binding.toolbar)
     supportActionBar?.setDisplayHomeAsUpEnabled(true)
     supportActionBar?.setDisplayShowHomeEnabled(true)
     window.statusBarColor = ContextCompat.getColor(this, R.color.colorPrimary)

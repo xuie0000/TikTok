@@ -12,24 +12,27 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.app.tiktok.R
 import com.app.tiktok.base.BaseActivity
+import com.app.tiktok.databinding.ActivityMainBinding
 import com.app.tiktok.ui.search.SearchActivity
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.activity_main.*
 
 @AndroidEntryPoint
 class MainActivity : BaseActivity(), NavController.OnDestinationChangedListener {
+
+  private lateinit var binding: ActivityMainBinding
   private val homeViewModel by viewModels<MainViewModel>()
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    setContentView(R.layout.activity_main)
+    binding = ActivityMainBinding.inflate(layoutInflater)
+    setContentView(binding.root)
 
     val navController = findNavController(R.id.nav_host_fragment)
-    nav_view.setupWithNavController(navController)
+    binding.navView.setupWithNavController(navController)
 
     navController.addOnDestinationChangedListener(this)
 
-    image_view_add_icon.setOnClickListener { startSearchActivity() }
+    binding.imageViewAddIcon.setOnClickListener { startSearchActivity() }
   }
 
   override fun onDestinationChanged(
@@ -50,10 +53,10 @@ class MainActivity : BaseActivity(), NavController.OnDestinationChangedListener 
           R.color.colorBlack
         )
 
-        nav_view.backgroundTintList = colorBlack
-        nav_view.itemTextColor = colorDark
-        nav_view.itemIconTintList = colorDark
-        image_view_add_icon.setImageResource(R.drawable.ic_add_icon_light)
+        binding.navView.backgroundTintList = colorBlack
+        binding.navView.itemTextColor = colorDark
+        binding.navView.itemIconTintList = colorDark
+        binding.imageViewAddIcon.setImageResource(R.drawable.ic_add_icon_light)
       }
       else -> {
         changeStatusBarColor(R.color.colorWhite)
@@ -67,10 +70,10 @@ class MainActivity : BaseActivity(), NavController.OnDestinationChangedListener 
           R.color.colorWhite
         )
 
-        nav_view.backgroundTintList = colorWhite
-        nav_view.itemTextColor = colorDark
-        nav_view.itemIconTintList = colorDark
-        image_view_add_icon.setImageResource(R.drawable.ic_add_icon_dark)
+        binding.navView.backgroundTintList = colorWhite
+        binding.navView.itemTextColor = colorDark
+        binding.navView.itemIconTintList = colorDark
+        binding.imageViewAddIcon.setImageResource(R.drawable.ic_add_icon_dark)
       }
     }
   }
